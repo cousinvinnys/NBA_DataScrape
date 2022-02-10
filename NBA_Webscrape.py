@@ -10,8 +10,21 @@ from nba_api.stats.static import players
 testBoxScore = box_score.BoxScorePlayerTrackV2(game_id='0022100825')
 df = testBoxScore.get_data_frames()[0]
 
+
 # print(df)
-# print(type(df.iloc(10)))
+# print(df.iloc[[4]])
+# print(df.columns)
+# print(df.loc[[4]])
+
+test = df["TEAM_CITY"]
+# print(test)
+
+test3 = df[["PLAYER_NAME", "RBC", "AST", "CFG_PCT"]]
+# print(test3)
+
+editedDF = df.drop(["START_POSITION", "SPD", "COMMENT", "TCHS", "DIST", "SAST", "FTAST", "PASS", "GAME_ID", "TEAM_ID", "TEAM_CITY"], axis='columns')
+print(editedDF)
+# print(df.info())
 # print(df['PLAYER_NAME'])
 
 
