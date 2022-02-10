@@ -11,7 +11,5 @@ import urllib.request
 
 page = urllib.request.urlopen('https://www.basketball-reference.com/boxscores/202202060CLE.html')
 soup = BeautifulSoup(page, features='html.parser')
-# print(soup.prettify())
-
-print(soup.find_all())
+print(soup.prettify())
 
