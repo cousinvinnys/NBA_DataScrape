@@ -1,34 +1,48 @@
-# First we import the endpoint
-# We will be using pandas dataframes to manipulate the data
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.endpoints import teamgamelog
-
-
+from nba_api.stats.endpoints import boxscoreplayertrackv2 as box_score
 import pandas as pd
 
-#Call the API endpoint passing in lebron's ID & which season
-gamelog_bron = playergamelog.PlayerGameLog(player_id='2544', season = '2018')
-
-#Converts gamelog object into a pandas dataframe
-#can also convert to JSON or dictionary
-df_bron_games_2018 = gamelog_bron.get_data_frames()
-
-# If you want all seasons, you must import the SeasonAll parameter
 from nba_api.stats.library.parameters import SeasonAll
 from nba_api.stats.static import teams
+from nba_api.stats.static import players
+
+testBoxScore = box_score.BoxScorePlayerTrackV2(game_id='0022100825')
+df = testBoxScore.get_data_frames()[0]
+
+# print(df)
+# print(type(df.iloc(10)))
+# print(df['PLAYER_NAME'])
+
+
+
+# LeBron's game logs from 2018-2019 season
+# gamelog_bron = playergamelog.PlayerGameLog(player_id='2544', season = '2018')
+
+# Converts gamelog object into a pandas dataframe, can also be JSON or dictionary
+# df_bron_games_2018 = gamelog_bron.get_data_frames()
+
+# All of LeBron's game logs
+# gamelog_bron_all = playergamelog.PlayerGameLog(player_id='2544', season = SeasonAll.all)
+
+# Dataframe of all of LeBron's game logs
+# df_bron_games_all = gamelog_bron_all.get_data_frames()
+# print(df_bron_games_all)
 
 nba_teams = teams.get_teams()
+
+# Identify the team object for the Cavs by abbreviation CLE
 cavs = [team for team in nba_teams if team['abbreviation'] == 'CLE'][0]
+
+# Exteracting the ID from the team object 
 cavsID = cavs['id']
 
-gamelog_bron_all = playergamelog.PlayerGameLog(player_id='2544', season = SeasonAll.all)
-
-
-
+# Cavs gamelog from this season
 cavs_gamelog = teamgamelog.TeamGameLog(team_id=cavsID)
 
-print(cavs_gamelog.get_data_frames())
+# Need single game meta-information
+cavs_gamelog_single = cavs_gamelog.get_data_frames()
 
-df_bron_games_all = gamelog_bron_all.get_data_frames()
+# print(cavs_gamelog.get_data_frames())
 
-# print(df_bron_games_all)
+
