@@ -47,7 +47,7 @@ nba_teams = teams.get_teams()
 # Identify the team object for the Cavs by abbreviation CLE
 cavs = [team for team in nba_teams if team['abbreviation'] == 'CLE'][0]
 
-# Exteracting the ID from the team object 
+# Exteracting the ID from the team object
 cavsID = cavs['id']
 
 # Cavs gamelog from this season
