@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from hashlib import new
 from matplotlib.pyplot import get
 from nba_api.stats.endpoints import boxscoretraditionalv2 as box_score
@@ -24,7 +24,7 @@ def get_latest_game(teamID):
     return teamGameLog.get_data_frames()[0].iloc[0]
 
 
-# Boolean to check if the team played a game yesterday
+# Boolean to check if the team played a game provided by the day offset
 def did_play_yesterday(teamID):
     teamGameLog = teamgamelog.TeamGameLog(team_id=teamID)
 
@@ -35,13 +35,14 @@ def did_play_yesterday(teamID):
     formatted_date = pd.to_datetime(latest_game_date)
 
     # Sourcery being a GOAT (!!!)
-    return (formatted_date == date.today() - timedelta(days=1))
+    return (formatted_date == pd.Timestamp(date.today()) - timedelta(days=2))
 
 # Need to work on an interface, or if I'm just going to pass the abbreviation through the command line
 
 
 # Gets team data for the frame
-teamID = get_team_id_abbrev('PHI')
+abbreviation = 'CLE'
+teamID = get_team_id_abbrev(abbreviation)
 teamGameLog = teamgamelog.TeamGameLog(team_id=teamID)
 latest_game = get_latest_game(teamID)
 latest_game_ID = latest_game['Game_ID']
@@ -59,8 +60,15 @@ df = testBoxScore.get_data_frames()[0]
 # Dropping NaN values (Coach's decisions to not play)
 df = df.dropna()
 
+# Delete rows that do not have the team abbreviation 
+    
+
+
+
+
+
 # Dropping columns that aren't needed
-dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION']
+dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID']
 for column in dropped_columns:
     df = df.drop([column], axis='columns')
 
@@ -68,5 +76,34 @@ for column in dropped_columns:
 cleaned_columns = ['PTS', 'PLUS_MINUS', 'PF', 'TO', 'BLK', 'STL', 'AST', 'REB', 'DREB', 'OREB', 'FTA', 'FTM', 'FG3A', 'FG3M', 'FGA', 'FGM']
 for column in cleaned_columns:
     df[[column]] = df[[column]].apply(np.int64)
+
+# Finding max value in a given column
+def max_value(column):
+    return df[column].max()
+
+# Finding the index of the max value in a given column
+def max_value_index(column):
+    return df[column].idxmax()
+
+def player_attribute_leader(column):
+    returnString = ''
+    columnMax = df[column].max()
+    columnMaxIndex = df[column].idxmax()
+    playerName = df.loc[columnMaxIndex, 'PLAYER_NAME']
+    returnString += f'({column}) {playerName}: ' + str(columnMax)
+    return returnString
+
+
+pointsMax = max_value('PTS')
+pointsMaxIndex = max_value_index('PTS')
+
+#pointsLeader = df.loc[pointsMaxIndex]
+
+pointsLeader = player_attribute_leader('PTS')
+# print(pointsLeader)
+#print(pointsLeader)
+
+#print(pointsMax)
+#print(pointsMaxIndex)
 
 print(df)
