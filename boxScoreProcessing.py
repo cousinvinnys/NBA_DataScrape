@@ -6,23 +6,19 @@ from nba_api.stats.endpoints import teamgamelog
 from nba_api.stats.static import teams
 from nba_api.stats.static import players
 
-
 import pandas as pd
 import numpy as np
-nba_teams = teams.get_teams()
-
 
 # Returns the ID of the team designated by the abbreviation
 def get_team_id_abbrev(team_name):
+    nba_teams = teams.get_teams()
     temp_team = [team for team in nba_teams if team['abbreviation'] == team_name][0]
     return temp_team['id']
-
 
 # Returns DataFrame of latest game
 def get_latest_game(teamID):
     teamGameLog = teamgamelog.TeamGameLog(team_id=teamID)
     return teamGameLog.get_data_frames()[0].iloc[0]
-
 
 # Boolean to check if the team played a game provided by the day offset
 def did_play_yesterday(teamID):
@@ -49,23 +45,19 @@ latest_game_ID = latest_game['Game_ID']
 
 # If the team played yesterday, get the box score
 if did_play_yesterday(teamID):
-    testBoxScore = box_score.BoxScoreTraditionalV2(game_id=latest_game_ID)
+    boxScoreFrames = box_score.BoxScoreTraditionalV2(game_id=latest_game_ID)
 else:
     print('No game yesterday')
     exit()
 
 # Grabbing the first dataframe from the get_data_frames() function, which is the box score
-df = testBoxScore.get_data_frames()[0]
+df = boxScoreFrames.get_data_frames()[0]
+
+# teamdf = testBoxScore.get_data_frames()[1]
+# print(teamdf)
 
 # Dropping NaN values (Coach's decisions to not play)
 df = df.dropna()
-
-# Delete rows that do not have the team abbreviation 
-    
-
-
-
-
 
 # Dropping columns that aren't needed
 dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID']
@@ -94,16 +86,21 @@ def player_attribute_leader(column):
     return returnString
 
 
-pointsMax = max_value('PTS')
-pointsMaxIndex = max_value_index('PTS')
-
-#pointsLeader = df.loc[pointsMaxIndex]
-
+df = df.loc[df['TEAM_ABBREVIATION'] == abbreviation]
 pointsLeader = player_attribute_leader('PTS')
-# print(pointsLeader)
 #print(pointsLeader)
+
+leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO']
+
+for attribute in leader_attributes: 
+    tempLeader = player_attribute_leader(attribute)
+    print(tempLeader)
 
 #print(pointsMax)
 #print(pointsMaxIndex)
 
+# Delete rows that do not have the team abbreviation 
+
 print(df)
+
+#print(df)
