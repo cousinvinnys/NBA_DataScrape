@@ -31,13 +31,13 @@ def did_play_yesterday(teamID):
     formatted_date = pd.to_datetime(latest_game_date)
 
     # Sourcery being a GOAT (!!!)
-    return (formatted_date == pd.Timestamp(date.today()) - timedelta(days=2))
+    return (formatted_date == pd.Timestamp(date.today()) - timedelta(days=1))
 
 # Need to work on an interface, or if I'm just going to pass the abbreviation through the command line
 
 
 # Gets team data for the frame
-abbreviation = 'CLE'
+abbreviation = 'LAC'
 teamID = get_team_id_abbrev(abbreviation)
 teamGameLog = teamgamelog.TeamGameLog(team_id=teamID)
 latest_game = get_latest_game(teamID)
@@ -53,14 +53,16 @@ else:
 # Grabbing the first dataframe from the get_data_frames() function, which is the box score
 df = boxScoreFrames.get_data_frames()[0]
 
-# teamdf = testBoxScore.get_data_frames()[1]
-# print(teamdf)
+teamdf = boxScoreFrames.get_data_frames()[1]
+
+print(teamdf)
+
 
 # Dropping NaN values (Coach's decisions to not play)
 df = df.dropna()
 
 # Dropping columns that aren't needed
-dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID']
+dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID', 'TEAM_ID']
 for column in dropped_columns:
     df = df.drop([column], axis='columns')
 
@@ -90,11 +92,11 @@ df = df.loc[df['TEAM_ABBREVIATION'] == abbreviation]
 pointsLeader = player_attribute_leader('PTS')
 #print(pointsLeader)
 
-leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO']
+leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO', 'FG3M']
 
 for attribute in leader_attributes: 
     tempLeader = player_attribute_leader(attribute)
-    print(tempLeader)
+    #print(tempLeader)
 
 #print(pointsMax)
 #print(pointsMaxIndex)
@@ -103,4 +105,4 @@ for attribute in leader_attributes:
 
 print(df)
 
-#print(df)
+
