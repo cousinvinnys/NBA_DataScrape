@@ -6,6 +6,10 @@ from nba_api.stats.static import teams, players
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+import os
+import plotly.graph_objects as go
 
 
 def get_team_id_abbrev(team_name):
@@ -73,12 +77,12 @@ def get_latest_game_ID(teamID):
 
 if __name__ == '__main__':
 
-    # Gets team data for the frame
+    # Team we're getting info for
     abbreviation = 'LAC'
 
+    # Get the team ID
     teamID = get_team_id_abbrev(abbreviation)
     latest_game_ID = get_latest_game_ID(teamID)
-    
 
     # If the team played yesterday, get the box score
     if did_play_yesterday(teamID):
@@ -86,29 +90,58 @@ if __name__ == '__main__':
     else:
         print('No game yesterday')
         exit()
-    
+
+    # Getting the second dataframe, which is team data
+    teamBoxScore = boxScoreFrames.get_data_frames()[1]
+
+    # Dropping columns that are not needed
+    dropped_columns = ['GAME_ID', 'TEAM_ID', 'TEAM_CITY', 'MIN', 'PF', 'PLUS_MINUS']
+    teamBoxScore = drop_columns(dropped_columns, teamBoxScore)
+
     # Grabbing the first dataframe from the get_data_frames() function, which is the box score
     playerBoxScore = boxScoreFrames.get_data_frames()[0]
 
-    teamBoxScore = boxScoreFrames.get_data_frames()[1]
-    print(teamBoxScore)
-
-    dropped_columns = ['COMMENT', 'MIN', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID', 'TEAM_ID', 'PLUS_MINUS']
+    # Dropping columns that are not needed
+    dropped_columns = ['COMMENT', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID', 'TEAM_ID', 'PLUS_MINUS', 'OREB', 'DREB', 'FT_PCT', 'FG3_PCT', 'FG_PCT', 'PF']
     playerBoxScore = drop_columns(dropped_columns, playerBoxScore)
 
     # Converting the floats to ints where they are needed
-    cleaned_columns = ['PTS', 'PF', 'TO', 'BLK', 'STL', 'AST', 'REB', 'DREB', 'OREB', 'FTA', 'FTM', 'FG3A', 'FG3M', 'FGA', 'FGM']
+    cleaned_columns = ['PTS', 'TO', 'BLK', 'STL', 'AST', 'REB', 'FTA', 'FTM', 'FG3A', 'FG3M', 'FGA', 'FGM']
     playerBoxScore = clean_columns(cleaned_columns, playerBoxScore)
 
     playerBoxScore = clean_df(playerBoxScore)
 
-    # Delete rows that do not have the team abbreviation 
+    # Delete rows that do not have the team abbreviation
     playerBoxScore = playerBoxScore.loc[playerBoxScore['TEAM_ABBREVIATION'] == abbreviation]
+
+    print(teamBoxScore)
+    print('\n')
+    print(playerBoxScore)
+    print('\n')
 
     leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO', 'FG3M']
 
-    for attribute in leader_attributes: 
+    for attribute in leader_attributes:
         leader = player_attribute_leader(attribute, playerBoxScore)
         print(leader)
 
-    print(playerBoxScore)
+# WORK IN PROGRESS working on converting data to a viewable table that is then sent to an image
+df = teamBoxScore
+
+fig = go.Figure(data=[go.Table(
+    header=dict(values=list(df.columns),
+                fill_color='paleturquoise',
+                align='left'),
+    cells=dict(values=df.transpose().values.tolist(),
+            fill_color='lavender',
+            align='left'))
+])
+
+fig.show()
+
+# Creating an image directory and putting the images in it
+if not os.path.exists("images"):
+    os.mkdir("images")
+fig.write_image("images/table.png")
+
+# I have all the information mostly, that I need for a email. Now just need to figure out how to format the data
