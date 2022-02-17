@@ -1,22 +1,32 @@
-   playerBoxScore.style
+from dash import Dash, dash_table, html
+import pandas as pd
+from collections import OrderedDict
 
-# Create a matplotlib table of the teamBoxScore dataframe
+data = OrderedDict(
+    [
+        ("Date", ["2015-01-01", "2015-10-24", "2016-05-10", "2017-01-10", "2018-05-10", "2018-08-15"]),
+        ("Region", ["Montreal", "Toronto", "New York City", "Miami", "San Francisco", "London"]),
+        ("Temperature", [1, -20, 3.512, 4, 10423, -441.2]),
+        ("Humidity", [10, 20, 30, 40, 50, 60]),
+        ("Pressure", [2, 10924, 3912, -10, 3591.2, 15]),
+    ]
+)
 
-#teamBoxScoreTable = ax.table(cellText=teamBoxScore.values, colLabels=teamBoxScore.columns, loc='center')
+df = pd.DataFrame(data)
 
-    testPlotDF = teamBoxScore
+app = Dash(__name__)
 
-    drop_columns_2 = ['FGM', 'FGA', 'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'TEAM_ABBREVIATION','TEAM_NAME']
-    testPlotDF = drop_columns(drop_columns_2, testPlotDF)
+app.layout = html.Div([
+    html.Div('10%', style={'backgroundColor': 'hotpink', 'color': 'white', 'width': '10%'}),
+    dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'id': c, 'name': c} for c in df.columns if c != 'Date'],
+        style_cell_conditional=[
+            {'if': {'column_id': 'Region'},
+             'width': '10%'}
+        ]
+    )
+])
 
-    fig, ax = plt.subplots()
-    #ax.axis('tight')
-    ax.axis('off')
-    ax.table(cellText=teamBoxScore.values, loc='center')
-
-    # increase the font size to make it easier to read
-    matplotlib.rc('font', size=20)
-
-    fig.tight_layout()
-
-    plt.show()
+if __name__ == '__main__':
+    app.run_server(debug=True)
