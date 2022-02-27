@@ -109,7 +109,7 @@ if __name__ == '__main__':
     teamID = get_team_id_abbrev(abbreviation)
     latest_game_ID = get_latest_game_ID(teamID)
 
-    if did_play_when(teamID, 1):
+    if did_play_when(teamID, 2):
         boxScoreFrames = box_score.BoxScoreTraditionalV2(game_id=latest_game_ID)
     else:
         print('No game yesterday')
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO', 'FG3M']
     for attribute in leader_attributes:
         leader = player_attribute_leader(attribute, teamScoreOnly)
-        # print(leader)
+        print(leader)
 
     print('\n', teamScoring, '\n\n', teamBoxScore, '\n\n', playerBoxScore)
 
