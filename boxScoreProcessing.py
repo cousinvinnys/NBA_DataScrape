@@ -5,15 +5,17 @@ from matplotlib.pyplot import get
 from nba_api.stats.endpoints import teamgamelog, boxscoretraditionalv2 as box_score, boxscoresummaryv2 as team_scoring
 
 from nba_api.stats.static import teams, players
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import os
 import plotly.graph_objects as go
-
 import json
+
+import smtplib
+import imghdr
+from email.message import EmailMessage
 
 from nbaAPIAccessor import nbaAPIAccessor
 
@@ -144,7 +146,10 @@ if __name__ == '__main__':
         leader = player_attribute_leader(attribute, teamScoreOnly)
         # print(leader)
 
-    #print('\n', teamScoring, '\n\n', teamBoxScore, '\n\n', playerBoxScore)
+    # print('\n', teamScoring, '\n\n', teamBoxScore, '\n\n', playerBoxScore)
+    msgContent = ""
+    msgContent += f'{teamScoring.to_string()}\n'
+    #print(msgContent)
 
 
 # WORK IN PROGRESS working on converting data to a viewable table that is then sent to an image
@@ -171,6 +176,27 @@ if not os.path.exists("images"):
     os.mkdir("images")
 
 fig.write_image("images/teamScore.png")
+
+
+EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+
+msg = EmailMessage()
+msg['Subject'] = f'NBA Team Scoring - {abbreviation}'
+msg['From'] = EMAIL_ADDRESS
+msg['To'] = 'tuneschristian@gmail.com'
+msg.set_content(f'Team scoring for {abbreviation} \n\n {msgContent}')
+
+with open('images/teamScore.png', 'rb') as f:
+    file_data = f.read()
+    file_type = imghdr.what(f.name)
+    file_name = f.name
+
+msg.add_attachment(file_data, maintype='image', subtype=file_type, filename=file_name)
+
+with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+    smtp.send_message(msg)
 
 
 # Blackbox function inside NBA API Accessor class
