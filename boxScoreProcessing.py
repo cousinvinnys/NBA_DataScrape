@@ -106,7 +106,7 @@ def get_team_color(abbreviation):
 
 if __name__ == '__main__':
 
-    abbreviation = 'CLE'
+    abbreviation = 'PHI'
     teamID = get_team_id_abbrev(abbreviation)
     latest_game_ID = get_latest_game_ID(teamID)
 
@@ -115,10 +115,6 @@ if __name__ == '__main__':
     else:
         print('No game yesterday')
         exit()
-
-    accessor = nbaAPIAccessor()
-    #frames = accessor.testFunc("testing asap rocky")
-    #print(frames)
 
     teamScoreFrames = team_scoring.BoxScoreSummaryV2(game_id=latest_game_ID)
     teamScoring = teamScoreFrames.get_data_frames()[5]
@@ -129,12 +125,10 @@ if __name__ == '__main__':
     teamScoring.rename(columns={'PTS_QTR1': 'QTR1', 'PTS_QTR2': 'QTR2', 'PTS_QTR3': 'QTR3', 'PTS_QTR4': 'QTR4'}, inplace=True)
     teamScoring.rename(columns={'TEAM_ABBREVIATION': 'TEAM'}, inplace=True)
 
-
     teamBoxScore = boxScoreFrames.get_data_frames()[1]
     dropped_columns = ['GAME_ID', 'TEAM_ID', 'TEAM_CITY', 'MIN', 'PF', 'PLUS_MINUS', 'TEAM_ABBREVIATION', 'FG_PCT', 'FG3_PCT', 'FT_PCT']
     teamBoxScore = drop_columns(dropped_columns, teamBoxScore)
     teamBoxScore.rename(columns={'TEAM_NAME': 'TEAM'}, inplace=True)
-
 
     playerBoxScore = boxScoreFrames.get_data_frames()[0]
     dropped_columns = ['COMMENT', 'NICKNAME', 'TEAM_CITY', 'START_POSITION', 'GAME_ID', 'PLAYER_ID',
@@ -145,13 +139,12 @@ if __name__ == '__main__':
     playerBoxScore = clean_df(playerBoxScore)
     teamScoreOnly = playerBoxScore.loc[playerBoxScore['TEAM_ABBREVIATION'] == abbreviation]
 
-
     leader_attributes = ['PTS', 'AST', 'REB', 'STL', 'BLK', 'TO', 'FG3M']
     for attribute in leader_attributes:
         leader = player_attribute_leader(attribute, teamScoreOnly)
-        print(leader)
+        # print(leader)
 
-    print('\n', teamScoring, '\n\n', teamBoxScore, '\n\n', playerBoxScore)
+    #print('\n', teamScoring, '\n\n', teamBoxScore, '\n\n', playerBoxScore)
 
 
 # WORK IN PROGRESS working on converting data to a viewable table that is then sent to an image
@@ -170,7 +163,15 @@ fig = go.Figure(data=[go.Table(
 ])
 
 fig.update_layout(width=1250, height=500)
-fig.show()
+# fig.show()
+
+
+# Creating an image directory and putting the images in it
+if not os.path.exists("images"):
+    os.mkdir("images")
+
+fig.write_image("images/teamScore.png")
+
 
 # Blackbox function inside NBA API Accessor class
 # Get team colors for each team, input into json file
@@ -200,10 +201,3 @@ fig.show()
 # ])
 
 # fig.show()
-
-# Creating an image directory and putting the images in it
-# if not os.path.exists("images"):
-# os.mkdir("images")
-# fig.write_image("images/table.png")
-
-# I have all the information mostly, that I need for a email. Now just need to figure out how to format the data

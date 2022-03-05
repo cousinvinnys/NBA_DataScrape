@@ -37,6 +37,3 @@ class nbaAPIAccessor:
         for column in dropped_columns:
             df = df.drop([column], axis='columns')
         return df
-
-    def testFunc(self, piss):
-        return piss
