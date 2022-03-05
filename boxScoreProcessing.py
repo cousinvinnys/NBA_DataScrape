@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from datetime import date, timedelta, datetime
 from hashlib import new
 from matplotlib.pyplot import get
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     teamID = get_team_id_abbrev(abbreviation)
     latest_game_ID = get_latest_game_ID(teamID)
 
-    if did_play_when(teamID, 2):
+    if did_play_when(teamID, 1):
         boxScoreFrames = box_score.BoxScoreTraditionalV2(game_id=latest_game_ID)
     else:
         print('No game yesterday')
