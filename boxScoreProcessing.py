@@ -106,7 +106,7 @@ def get_team_color(abbreviation):
 
 if __name__ == '__main__':
 
-    abbreviation = 'PHI'
+    abbreviation = 'CLE'
     teamID = get_team_id_abbrev(abbreviation)
     latest_game_ID = get_latest_game_ID(teamID)
 
